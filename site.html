@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Browser IDE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <style>
+        /* Полноэкранный интерфейс */
+        body { margin: 0; height: 100vh; display: flex; flex-direction: column; background: #1e1e1e; color: #fff; }
+        .top-bar { background: #252526; padding: 10px; display: flex; gap: 10px; }
+        .editor-area { flex: 1; display: flex; }
+        #editor { flex: 1; height: 60vh; }
+        #terminal { background: #000; height: 200px; padding: 10px; overflow-y: auto; font-family: monospace; }
+        button { background: #333; color: #fff; border: none; padding: 8px 15px; cursor: pointer; }
+        .file-tree { width: 200px; background: #2d2d30; padding: 10px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <select id="language">
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="html">HTML</option>
+        </select>
+        <button onclick="runCode()">▶ Run</button>
+        <button onclick="newFile()">📄 New</button>
+        <button onclick="saveFile()">💾 Save</button>
+    </div>
+
+    <div class="editor-area">
+        <div class="file-tree" id="fileTree"></div>
+        <textarea id="editor"></textarea>
+    </div>
+
+    <div id="terminal"></div>
+
+    <!-- CodeMirror и зависимости -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+
+    <!-- Pyodide (Python в браузере) -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+
+    <script>
+        // Инициализация Pyodide
+        let pyodide;
+        async function initPyodide() {
+            pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.21.3/full/" });
+            terminal.innerHTML += "Python runtime initialized\n";
+        }
+        initPyodide();
+
+        // Система файлов
+        let files = {
+            'main.py': '# Write Python code here\nprint("Hello from Browser IDE!")',
+            'index.html': '<!DOCTYPE html>\n<html>\n<body>\n<h1>Hello World</h1>\n</body>\n</html>'
+        };
+
+        // Инициализация редактора
+        const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+            lineNumbers: true,
+            mode: 'python',
+            theme: 'dracula',
+            value: files['main.py']
+        });
+
+        // Терминал
+        const terminal = document.getElementById('terminal');
+
+        // Запуск кода
+        async function runCode() {
+            const code = editor.getValue();
+            const lang = document.getElementById('language').value;
+            
+            terminal.innerHTML += `\n> Running ${lang} code...\n`;
+            
+            try {
+                let output;
+                switch(lang) {
+                    case 'python':
+                        output = await pyodide.runPythonAsync(code);
+                        break;
+                    case 'javascript':
+                        output = eval(code);
+                        break;
+                    case 'html':
+                        const win = window.open();
+                        win.document.write(code);
+                        output = "HTML opened in new window";
+                        break;
+                }
+                terminal.innerHTML += output + '\n';
+            } catch(e) {
+                terminal.innerHTML += `Error: ${e}\n`;
+            }
+            
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Файловые операции
+        function newFile() {
+            const name = prompt('File name:');
+            if(name) {
+                files[name] = '';
+                editor.setValue('');
+                terminal.innerHTML += `Created file: ${name}\n`;
+            }
+        }
+
+        function saveFile() {
+            const content = editor.getValue();
+            // Здесь можно добавить логику сохранения
+            terminal.innerHTML += "File saved (simulated)\n";
+        }
+    </script>
+</body>
+</html>
