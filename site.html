@@ -1,118 +1,307 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Browser IDE</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyWeb IDE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <style>
-        /* Полноэкранный интерфейс */
-        body { margin: 0; height: 100vh; display: flex; flex-direction: column; background: #1e1e1e; color: #fff; }
-        .top-bar { background: #252526; padding: 10px; display: flex; gap: 10px; }
-        .editor-area { flex: 1; display: flex; }
-        #editor { flex: 1; height: 60vh; }
-        #terminal { background: #000; height: 200px; padding: 10px; overflow-y: auto; font-family: monospace; }
-        button { background: #333; color: #fff; border: none; padding: 8px 15px; cursor: pointer; }
-        .file-tree { width: 200px; background: #2d2d30; padding: 10px; overflow-y: auto; }
+        :root {
+            --primary: #2ecc71;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --danger: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--dark);
+            color: var(--light);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .navbar {
+            background: #34495e;
+            padding: 12px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .editor-container {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #editor {
+            flex: 1;
+            height: 100%;
+        }
+
+        .terminal {
+            background: #1e272e;
+            height: 250px;
+            padding: 15px;
+            overflow-y: auto;
+            border-top: 2px solid #34495e;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            filter: brightness(1.1);
+        }
+
+        select {
+            background: #34495e;
+            color: white;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #34495e;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .package-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .package-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: #2c3e50;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <div class="top-bar">
+    <div class="navbar">
         <select id="language">
             <option value="python">Python</option>
             <option value="javascript">JavaScript</option>
             <option value="html">HTML</option>
         </select>
-        <button onclick="runCode()">▶ Run</button>
-        <button onclick="newFile()">📄 New</button>
-        <button onclick="saveFile()">💾 Save</button>
+        <button onclick="runCode()" id="runBtn">
+            <span>▶ Run</span>
+        </button>
+        <button onclick="togglePackageManager()">
+            📦 Packages
+        </button>
+        <div id="status" style="margin-left: auto; color: var(--primary)"></div>
     </div>
 
-    <div class="editor-area">
-        <div class="file-tree" id="fileTree"></div>
-        <textarea id="editor"></textarea>
+    <div class="editor-container">
+        <textarea id="editor">print("Welcome to PyWeb IDE!")\n</textarea>
     </div>
 
-    <div id="terminal"></div>
+    <div class="terminal" id="terminal">Initializing Python environment...</div>
 
-    <!-- CodeMirror и зависимости -->
+    <div class="modal" id="packageModal">
+        <div class="modal-content">
+            <h3>📚 Package Manager</h3>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <input type="text" id="packageInput" placeholder="Package name" style="flex:1; padding:8px;">
+                <button onclick="installPackage()">Install</button>
+                <button onclick="updatePackage()">Update</button>
+            </div>
+            <div class="package-list" id="packageList"></div>
+            <button onclick="togglePackageManager()" style="width:100%; margin-top:10px;">Close</button>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
-
-    <!-- Pyodide (Python в браузере) -->
     <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
 
     <script>
-        // Инициализация Pyodide
         let pyodide;
-        async function initPyodide() {
-            pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.21.3/full/" });
-            terminal.innerHTML += "Python runtime initialized\n";
-        }
-        initPyodide();
-
-        // Система файлов
-        let files = {
-            'main.py': '# Write Python code here\nprint("Hello from Browser IDE!")',
-            'index.html': '<!DOCTYPE html>\n<html>\n<body>\n<h1>Hello World</h1>\n</body>\n</html>'
-        };
+        let isPyodideReady = false;
+        const terminal = document.getElementById('terminal');
+        const status = document.getElementById('status');
+        const packageModal = document.getElementById('packageModal');
+        let installedPackages = new Set();
 
         // Инициализация редактора
         const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
             lineNumbers: true,
             mode: 'python',
             theme: 'dracula',
-            value: files['main.py']
+            indentUnit: 4,
+            extraKeys: {
+                'Ctrl-Enter': runCode,
+                'Shift-Enter': runCode
+            }
         });
 
-        // Терминал
-        const terminal = document.getElementById('terminal');
+        // Инициализация Pyodide
+        async function initializePyodide() {
+            try {
+                status.innerHTML = '<div class="loader"></div> Initializing...';
+                pyodide = await loadPyodide({ 
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.21.3/full/",
+                    stdout: msg => terminal.innerHTML += msg,
+                    stderr: msg => terminal.innerHTML += `<span style="color:${getComputedStyle(document.documentElement).getPropertyValue('--danger')}">${msg}</span>`
+                });
+                
+                await pyodide.loadPackage(['micropip']);
+                terminal.innerHTML += "\nPython environment ready!\n";
+                isPyodideReady = true;
+                status.innerHTML = '✅ Ready';
+                updatePackageList();
+            } catch (error) {
+                terminal.innerHTML += `\nError initializing Python: ${error}\n`;
+                status.innerHTML = '❌ Initialization failed';
+            }
+        }
+
+        // Управление пакетами
+        async function installPackage() {
+            const packageName = document.getElementById('packageInput').value;
+            if (!packageName) return;
+
+            try {
+                status.innerHTML = '<div class="loader"></div> Installing...';
+                const micropip = pyodide.pyimport("micropip");
+                await micropip.install(packageName);
+                installedPackages.add(packageName);
+                updatePackageList();
+                terminal.innerHTML += `\n✅ Successfully installed ${packageName}\n`;
+            } catch (e) {
+                terminal.innerHTML += `\n❌ Error installing ${packageName}: ${e}\n`;
+            }
+            status.innerHTML = '✅ Ready';
+        }
+
+        async function updatePackage() {
+            const packageName = document.getElementById('packageInput').value;
+            if (!packageName) return;
+
+            try {
+                status.innerHTML = '<div class="loader"></div> Updating...';
+                const micropip = pyodide.pyimport("micropip");
+                await micropip.install(`--upgrade ${packageName}`);
+                terminal.innerHTML += `\n✅ Successfully updated ${packageName}\n`;
+            } catch (e) {
+                terminal.innerHTML += `\n❌ Error updating ${packageName}: ${e}\n`;
+            }
+            status.innerHTML = '✅ Ready';
+        }
+
+        function updatePackageList() {
+            const list = document.getElementById('packageList');
+            list.innerHTML = Array.from(installedPackages).map(pkg => `
+                <div class="package-item">
+                    <span>${pkg}</span>
+                    <button onclick="uninstallPackage('${pkg}')">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function togglePackageManager() {
+            packageModal.style.display = packageModal.style.display === 'flex' ? 'none' : 'flex';
+        }
 
         // Запуск кода
         async function runCode() {
+            if (!isPyodideReady) {
+                terminal.innerHTML += "\nPython environment not ready yet!\n";
+                return;
+            }
+
             const code = editor.getValue();
             const lang = document.getElementById('language').value;
             
             terminal.innerHTML += `\n> Running ${lang} code...\n`;
             
             try {
-                let output;
                 switch(lang) {
                     case 'python':
-                        output = await pyodide.runPythonAsync(code);
+                        await pyodide.runPythonAsync(code);
                         break;
                     case 'javascript':
-                        output = eval(code);
+                        terminal.innerHTML += eval(code) + '\n';
                         break;
                     case 'html':
                         const win = window.open();
                         win.document.write(code);
-                        output = "HTML opened in new window";
                         break;
                 }
-                terminal.innerHTML += output + '\n';
             } catch(e) {
-                terminal.innerHTML += `Error: ${e}\n`;
+                terminal.innerHTML += `<span style="color:var(--danger)">Error: ${e}</span>\n`;
             }
             
             terminal.scrollTop = terminal.scrollHeight;
         }
 
-        // Файловые операции
-        function newFile() {
-            const name = prompt('File name:');
-            if(name) {
-                files[name] = '';
-                editor.setValue('');
-                terminal.innerHTML += `Created file: ${name}\n`;
-            }
-        }
+        // Инициализация при загрузке
+        initializePyodide();
 
-        function saveFile() {
-            const content = editor.getValue();
-            // Здесь можно добавить логику сохранения
-            terminal.innerHTML += "File saved (simulated)\n";
+        // Закрытие модального окна
+        window.onclick = function(event) {
+            if (event.target === packageModal) {
+                packageModal.style.display = "none";
+            }
         }
     </script>
 </body>
