@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лавка Боба - Колесо фортуны</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #66cc66, #6699ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+        }
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            transition: transform 5s ease-out;
+            background: conic-gradient(
+                #ffcc00 0% 60%,
+                #ff6666 60% 90%,
+                #66cc66 90% 95%,
+                #6699ff 95% 100%
+            );
+        }
+        .legend {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        #spinBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #6699ff;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+        #spinBtn:hover {
+            background-color: #66cc66;
+        }
+        .promo-code {
+            margin-top: 20px;
+        }
+        #promoCode {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        #applyPromo {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #66cc66;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            transition: background-color 0.3s ease;
+        }
+        #applyPromo:hover {
+            background-color: #6699ff;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Лавка Боба - Колесо фортуны</h1>
+        <div class="wheel-container">
+            <div class="wheel" id="wheel"></div>
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ffcc00;"></div>
+                <span>Конфета - 60%</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ff6666;"></div>
+                <span>Чипсы 5d - 30%</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #66cc66;"></div>
+                <span>Чипсы Лейс - 5%</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #6699ff;"></div>
+                <span>Лимонад - 5%</span>
+            </div>
+        </div>
+        <button id="spinBtn">Крутить</button>
+        <div class="promo-code">
+            <input type="text" id="promoCode" placeholder="Введите промокод">
+            <button id="applyPromo">Применить</button>
+        </div>
+        <p id="result"></p>
+    </div>
+    <script>
+        const wheel = document.getElementById('wheel');
+        const spinBtn = document.getElementById('spinBtn');
+        const promoCodeInput = document.getElementById('promoCode');
+        const applyPromoBtn = document.getElementById('applyPromo');
+        const resultText = document.getElementById('result');
+
+        const prizes = ['Конфета', 'Чипсы 5d', 'Чипсы Лейс', 'Лимонад'];
+        const probabilities = [60, 30, 5, 5];
+        const promoCodes = ['Ishak', 'kozel', 'login12As', 'login13As', 'login14As', 'login15As', 'login16As', 'login17As', 'login18As', 'login19As', 'login20As'];
+        let usedPromoCodes = [];
+
+        function spinWheel() {
+            if (usedPromoCodes.length === 0) {
+                resultText.textContent = "Введите промокод для активации рулетки.";
+                return;
+            }
+
+            let random = Math.random() * 100;
+            let cumulativeProbability = 0;
+            let selectedPrize = '';
+
+            for (let i = 0; i < probabilities.length; i++) {
+                cumulativeProbability += probabilities[i];
+                if (random < cumulativeProbability) {
+                    selectedPrize = prizes[i];
+                    break;
+                }
+            }
+
+            const degrees = [90, 180, 270, 360];
+            const randomDegree = degrees[Math.floor(Math.random() * degrees.length)];
+
+            wheel.style.transform = `rotate(${randomDegree * 3}deg)`;
+
+            setTimeout(() => {
+                resultText.textContent = `Вы выиграли: ${selectedPrize}!`;
+            }, 5000);
+        }
+
+        applyPromoBtn.addEventListener('click', () => {
+            const promo = promoCodeInput.value.trim();
+            if (promoCodes.includes(promo) && !usedPromoCodes.includes(promo)) {
+                usedPromoCodes.push(promo);
+                resultText.textContent = "Промокод активирован! Крутите колесо.";
+                spinBtn.disabled = false;
+            } else {
+                resultText.textContent = "Неверный или уже использованный промокод.";
+            }
+        });
+
+        spinBtn.addEventListener('click', spinWheel);
+    </script>
+</body>
+</html>
