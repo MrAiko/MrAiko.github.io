@@ -11,9 +11,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             color: #333;
+            overflow: hidden;
         }
         .container {
             text-align: center;
@@ -22,8 +23,9 @@
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
             max-width: 400px;
-            width: 100%;
+            width: 90%;
             animation: fadeIn 1s ease-in-out;
+            position: relative;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
@@ -36,8 +38,8 @@
         }
         .wheel-container {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 250px;
+            height: 250px;
             margin: 20px auto;
         }
         .wheel {
@@ -46,13 +48,28 @@
             border-radius: 50%;
             position: relative;
             overflow: hidden;
-            transition: transform 5s ease-out;
+            transition: transform 5s cubic-bezier(0.25, 0.1, 0.25, 1);
             background: conic-gradient(
                 #ffcc00 0% 60%,
-                #ff6666 60% 90%,
-                #66cc66 90% 95%,
-                #6699ff 95% 100%
+                #ff6666 60% 85%,
+                #66cc66 85% 90%,
+                #6699ff 90% 95%,
+                #cc66ff 95% 100%
             );
+            transform: rotate(0deg);
+        }
+        .arrow {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%) rotate(180deg);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ff4444;
+            z-index: 1;
+            filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
         }
         .legend {
             margin-top: 20px;
@@ -69,6 +86,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2));
         }
         #spinBtn {
             margin-top: 20px;
@@ -79,19 +97,27 @@
             color: #fff;
             border: none;
             border-radius: 10px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
         #spinBtn:hover {
             background-color: #66cc66;
+            transform: scale(1.05);
+        }
+        #spinBtn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
         .promo-code {
             margin-top: 20px;
+            display: flex;
+            gap: 10px;
         }
         #promoCode {
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 10px;
+            flex: 1;
         }
         #applyPromo {
             padding: 10px 20px;
@@ -101,43 +127,63 @@
             color: #fff;
             border: none;
             border-radius: 10px;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
         #applyPromo:hover {
             background-color: #6699ff;
+            transform: scale(1.05);
         }
         #result {
             margin-top: 20px;
             font-size: 18px;
             color: #333;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1));
+        }
+        .price-tag {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #555;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1));
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Лавка Боба - Колесо фортуны</h1>
+        <div class="price-tag">Цена за прокрутку: 50 руб</div>
         <div class="wheel-container">
             <div class="wheel" id="wheel"></div>
+            <div class="arrow"></div>
         </div>
         <div class="legend">
             <div class="legend-item">
-                <div class="legend-color" style="background-color: #ffcc00;"></div>
+                <img src="https://mraiko.github.io/ee6a624fab8dd043f116dbf488d20bca.jpg" alt="Конфета" width="30" height="30">
                 <span>Конфета - 60%</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background-color: #ff6666;"></div>
-                <span>Чипсы 5d - 30%</span>
+                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/d19rjgVABmQMVv3RqEBeqKoEwMcvhehgLtkuZrtmgtNG9HEtSpHWj3DT6rN_T5mPFZv0F15d_c_2s1Qp-KRFO2MXdos0QRoFWSf1uPhgUryicbXLa_SAcVqwJxfPLqrmIuxx3bodV0LUZkdT-_ssskTytBJzfOT-akMRVE0htW9Pq6_-MUyjDLxiAFls7KLQ-jkoI_v0t.webp" alt="Чипсы 5d" width="30" height="30">
+                <span>Чипсы 5d - 25%</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background-color: #66cc66;"></div>
+                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/i.webp" alt="Чипсы Лейс" width="30" height="30">
                 <span>Чипсы Лейс - 5%</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background-color: #6699ff;"></div>
-                <span>Лимонад - 5%</span>
+                <img src="https://mraiko.github.io/png-transparent-cola-in-glass-coca-cola-fizzy-drinks-lynchburg-lemonade-cocktail-creative-coca-cola-carbonated-drinks-recipe-non-alcoholic-beverage-cola.png" alt="Бутылка Кока-колы" width="30" height="30">
+                <span>Бутылка Кока-колы - 5%</span>
+            </div>
+            <div class="legend-item">
+                <img src="https://mraiko.github.io/8bbce450f1854561b9eb6a54d9869d8f.png" alt="Бутылка лимонада" width="30" height="30">
+                <span>Бутылка лимонада - 5%</span>
             </div>
         </div>
-        <button id="spinBtn">Крутить</button>
+        <button id="spinBtn" disabled>Крутить</button>
         <div class="promo-code">
             <input type="text" id="promoCode" placeholder="Введите промокод">
             <button id="applyPromo">Применить</button>
@@ -151,36 +197,40 @@
         const applyPromoBtn = document.getElementById('applyPromo');
         const resultText = document.getElementById('result');
 
-        const prizes = ['Конфета', 'Чипсы 5d', 'Чипсы Лейс', 'Лимонад'];
-        const probabilities = [60, 30, 5, 5];
-        const promoCodes = ['Ishak', 'kozel', 'login12As', 'login13As', 'login14As', 'login15As', 'login16As', 'login17As', 'login18As', 'login19As', 'login20As'];
+        const prizes = ['Конфета', 'Чипсы 5d', 'Чипсы Лейс', 'Бутылка Кока-колы', 'Бутылка лимонада'];
+        const probabilities = [60, 25, 5, 5, 5]; // Шансы: 60%, 25%, 5%, 5%, 5%
+        const promoCodes = [
+            'Ishak', 'kozel', 'login12As', 'login13As', 'login14As', 'login15As', 
+            'login16As', 'login17As', 'login18As', 'login19As', 'login20As',
+            ...Array.from({ length: 80 }, (_, i) => `login${21 + i}As`)
+        ];
         let usedPromoCodes = [];
+        let isSpinning = false;
+
+        function calculatePrize(rotation) {
+            const normalizedRotation = ((rotation % 360) + 360) % 360;
+            if (normalizedRotation >= 0 && normalizedRotation < 180) return prizes[0]; // Конфета (60%)
+            if (normalizedRotation >= 180 && normalizedRotation < 270) return prizes[1]; // Чипсы 5d (25%)
+            if (normalizedRotation >= 270 && normalizedRotation < 300) return prizes[2]; // Чипсы Лейс (5%)
+            if (normalizedRotation >= 300 && normalizedRotation < 330) return prizes[3]; // Бутылка Кока-колы (5%)
+            return prizes[4]; // Бутылка лимонада (5%)
+        }
 
         function spinWheel() {
-            if (usedPromoCodes.length === 0) {
-                resultText.textContent = "Введите промокод для активации рулетки.";
-                return;
-            }
+            if (isSpinning) return;
+            isSpinning = true;
 
-            let random = Math.random() * 100;
-            let cumulativeProbability = 0;
-            let selectedPrize = '';
-
-            for (let i = 0; i < probabilities.length; i++) {
-                cumulativeProbability += probabilities[i];
-                if (random < cumulativeProbability) {
-                    selectedPrize = prizes[i];
-                    break;
-                }
-            }
-
-            const degrees = [90, 180, 270, 360];
-            const randomDegree = degrees[Math.floor(Math.random() * degrees.length)];
-
-            wheel.style.transform = `rotate(${randomDegree * 3}deg)`;
+            // Случайная сила вращения (от 3 до 6 полных оборотов)
+            const randomForce = Math.random() * 3 + 3;
+            const targetRotation = 360 * randomForce + Math.random() * 360; // Случайный угол + обороты
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
 
             setTimeout(() => {
-                resultText.textContent = `Вы выиграли: ${selectedPrize}!`;
+                const finalRotation = targetRotation % 360;
+                const prize = calculatePrize(finalRotation);
+                resultText.textContent = `Вы выиграли: ${prize}!`;
+                spinBtn.disabled = true;
+                isSpinning = false;
             }, 5000);
         }
 
@@ -188,8 +238,9 @@
             const promo = promoCodeInput.value.trim();
             if (promoCodes.includes(promo) && !usedPromoCodes.includes(promo)) {
                 usedPromoCodes.push(promo);
-                resultText.textContent = "Промокод активирован! Крутите колесо.";
+                resultText.textContent = "Промокод активирован! Можно крутить 1 раз.";
                 spinBtn.disabled = false;
+                promoCodeInput.value = '';
             } else {
                 resultText.textContent = "Неверный или уже использованный промокод.";
             }
