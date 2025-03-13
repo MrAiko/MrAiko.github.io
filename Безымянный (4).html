@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лавка Боба - Цены</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffcc00, #ff6666);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .price-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .price-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+        .price-item img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        .price-item span {
+            font-size: 18px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Лавка Боба - Цены</h1>
+        <div class="price-list">
+            <div class="price-item">
+                <img src="https://mraiko.github.io/ee6a624fab8dd043f116dbf488d20bca.jpg" alt="Конфета">
+                <span>Конфета</span>
+                <span>20 руб</span>
+            </div>
+            <div class="price-item">
+                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/d19rjgVABmQMVv3RqEBeqKoEwMcvhehgLtkuZrtmgtNG9HEtSpHWj3DT6rN_T5mPFZv0F15d_c_2s1Qp-KRFO2MXdos0QRoFWSf1uPhgUryicbXLa_SAcVqwJxfPLqrmIuxx3bodV0LUZkdT-_ssskTytBJzfOT-akMRVE0htW9Pq6_-MUyjDLxiAFls7KLQ-jkoI_v0t.webp" alt="Чипсы 5d">
+                <span>Чипсы 5d</span>
+                <span>24 руб</span>
+            </div>
+            <div class="price-item">
+                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/i.webp" alt="Чипсы Лейс">
+                <span>Чипсы Лейс</span>
+                <span>50 руб</span>
+            </div>
+            <div class="price-item">
+                <img src="https://mraiko.github.io/png-transparent-cola-in-glass-coca-cola-fizzy-drinks-lynchburg-lemonade-cocktail-creative-coca-cola-carbonated-drinks-recipe-non-alcoholic-beverage-cola.png" alt="Кока-кола">
+                <span>Стакан Кока-колы</span>
+                <span>20 руб</span>
+            </div>
+            <div class="price-item">
+                <img src="https://mraiko.github.io/8bbce450f1854561b9eb6a54d9869d8f.png" alt="Лимонад">
+                <span>Стакан лимонада</span>
+                <span>10 руб</span>
+            </div>
+            <div class="price-item">
+                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/i%20(2).webp" alt="Выпечка">
+                <span>Выпечка</span>
+                <span>70 руб</span>
+            </div>
+            <div class="price-item">
+                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/i%20(1).webp" alt="Вода">
+                <span>Стакан воды</span>
+                <span>6 руб</span>
+            </div>
+            <div class="price-item">
+                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/100030223924b0.webp" alt="Сок">
+                <span>Сок (бутылка)</span>
+                <span>25 руб</span>
+            </div>
+            <div class="price-item">
+                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/100030681792b0.webp" alt="Сухарики">
+                <span>Сухарики</span>
+                <span>30 руб</span>
+            </div>
+            <div class="price-item">
+                <img src="https://mraiko.github.io/6245195874.jpg" alt="Чупа-чупс">
+                <span>Чупа-чупс</span>
+                <span>20 руб</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
