@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #66cc66, #6699ff);
+            background: linear-gradient(135deg, #00ccff, #00ffcc);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -15,6 +15,7 @@
             margin: 0;
             color: #333;
             overflow: hidden;
+            background-image: url('https://www.transparenttextures.com/patterns/cartographer.png');
         }
         .container {
             text-align: center;
@@ -52,9 +53,8 @@
             background: conic-gradient(
                 #ffcc00 0% 60%,
                 #ff6666 60% 85%,
-                #66cc66 85% 90%,
-                #6699ff 90% 95%,
-                #cc66ff 95% 100%
+                #66cc66 85% 95%,
+                #6699ff 95% 100%
             );
             transform: rotate(0deg);
         }
@@ -163,24 +163,16 @@
         </div>
         <div class="legend">
             <div class="legend-item">
-                <img src="https://mraiko.github.io/ee6a624fab8dd043f116dbf488d20bca.jpg" alt="Конфета" width="30" height="30">
-                <span>Конфета - 60%</span>
+                <span>Мюсики (Конфеты) 50гр - 60%</span>
             </div>
             <div class="legend-item">
-                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/d19rjgVABmQMVv3RqEBeqKoEwMcvhehgLtkuZrtmgtNG9HEtSpHWj3DT6rN_T5mPFZv0F15d_c_2s1Qp-KRFO2MXdos0QRoFWSf1uPhgUryicbXLa_SAcVqwJxfPLqrmIuxx3bodV0LUZkdT-_ssskTytBJzfOT-akMRVE0htW9Pq6_-MUyjDLxiAFls7KLQ-jkoI_v0t.webp" alt="Чипсы 5d" width="30" height="30">
-                <span>Чипсы 5d - 25%</span>
+                <span>Стакан попкорна - 25%</span>
             </div>
             <div class="legend-item">
-                <img src="https://raw.githubusercontent.com/MrAiko/MrAiko.github.io/refs/heads/main/i.webp" alt="Чипсы Лейс" width="30" height="30">
-                <span>Чипсы Лейс - 5%</span>
+                <span>Стакан чипсов - 10%</span>
             </div>
             <div class="legend-item">
-                <img src="https://mraiko.github.io/png-transparent-cola-in-glass-coca-cola-fizzy-drinks-lynchburg-lemonade-cocktail-creative-coca-cola-carbonated-drinks-recipe-non-alcoholic-beverage-cola.png" alt="Бутылка Кока-колы" width="30" height="30">
-                <span>Бутылка Кока-колы - 5%</span>
-            </div>
-            <div class="legend-item">
-                <img src="https://mraiko.github.io/8bbce450f1854561b9eb6a54d9869d8f.png" alt="Бутылка лимонада" width="30" height="30">
-                <span>Бутылка лимонада - 5%</span>
+                <span>Стакан жев. драже - 5%</span>
             </div>
         </div>
         <button id="spinBtn" disabled>Крутить</button>
@@ -197,8 +189,8 @@
         const applyPromoBtn = document.getElementById('applyPromo');
         const resultText = document.getElementById('result');
 
-        const prizes = ['Конфета', 'Чипсы 5d', 'Чипсы Лейс', 'Бутылка Кока-колы', 'Бутылка лимонада'];
-        const probabilities = [60, 25, 5, 5, 5]; // Шансы: 60%, 25%, 5%, 5%, 5%
+        const prizes = ['Мюсики (Конфеты) 50гр', 'Стакан попкорна', 'Стакан чипсов', 'Стакан жев. драже'];
+        const probabilities = [60, 25, 10, 5]; // Шансы: 60%, 25%, 10%, 5%
         const promoCodes = [
             'Ishak', 'kozel', 'login12As', 'login13As', 'login14As', 'login15As', 
             'login16As', 'login17As', 'login18As', 'login19As', 'login20As',
@@ -209,11 +201,10 @@
 
         function calculatePrize(rotation) {
             const normalizedRotation = ((rotation % 360) + 360) % 360;
-            if (normalizedRotation >= 0 && normalizedRotation < 180) return prizes[0]; // Конфета (60%)
-            if (normalizedRotation >= 180 && normalizedRotation < 270) return prizes[1]; // Чипсы 5d (25%)
-            if (normalizedRotation >= 270 && normalizedRotation < 300) return prizes[2]; // Чипсы Лейс (5%)
-            if (normalizedRotation >= 300 && normalizedRotation < 330) return prizes[3]; // Бутылка Кока-колы (5%)
-            return prizes[4]; // Бутылка лимонада (5%)
+            if (normalizedRotation >= 0 && normalizedRotation < 180) return prizes[0]; // Мюсики (60%)
+            if (normalizedRotation >= 180 && normalizedRotation < 270) return prizes[1]; // Попкорн (25%)
+            if (normalizedRotation >= 270 && normalizedRotation < 300) return prizes[2]; // Чипсы (10%)
+            return prizes[3]; // Жев. драже (5%)
         }
 
         function spinWheel() {
