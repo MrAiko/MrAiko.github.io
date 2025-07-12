@@ -1,0 +1,147 @@
+// telegram_bot_builder_ui — Full Version Frontend
+
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { motion } from "framer-motion";
+import { Save, PlusCircle } from "lucide-react";
+
+export default function BotBuilder() {
+  const [botToken, setBotToken] = useState("");
+  const [blocks, setBlocks] = useState([]);
+  const [selectedBlockId, setSelectedBlockId] = useState(null);
+
+  const addBlock = () => {
+    const newBlock = {
+      id: Date.now(),
+      message: "",
+      buttons: [""],
+      next: null
+    };
+    setBlocks([...blocks, newBlock]);
+  };
+
+  const updateBlock = (id, key, value) => {
+    setBlocks(
+      blocks.map(block =>
+        block.id === id ? { ...block, [key]: value } : block
+      )
+    );
+  };
+
+  const updateButton = (id, index, value) => {
+    setBlocks(
+      blocks.map(block =>
+        block.id === id
+          ? {
+              ...block,
+              buttons: block.buttons.map((btn, i) =>
+                i === index ? value : btn
+              )
+            }
+          : block
+      )
+    );
+  };
+
+  const setNextBlock = (id, nextId) => {
+    setBlocks(
+      blocks.map(block =>
+        block.id === id ? { ...block, next: nextId } : block
+      )
+    );
+  };
+
+  const exportLogic = () => {
+    const botData = {
+      token: botToken,
+      flow: blocks
+    };
+    console.log("🔁 Bot Logic Export:", botData);
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto p-6 space-y-6">
+      <motion.h1
+        className="text-4xl font-bold"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        Конструктор Telegram-ботов 🚀
+      </motion.h1>
+
+      <div className="flex gap-4 items-center">
+        <Input
+          placeholder="Токен бота от @BotFather"
+          value={botToken}
+          onChange={e => setBotToken(e.target.value)}
+          className="w-full"
+        />
+        <Button onClick={exportLogic} className="gap-2">
+          <Save size={18} /> Сохранить
+        </Button>
+      </div>
+
+      <div className="space-y-6">
+        {blocks.map(block => (
+          <Card
+            key={block.id}
+            className={`rounded-2xl p-4 border shadow transition-all duration-300 ${
+              selectedBlockId === block.id ? "border-blue-500" : ""
+            }`}
+            onClick={() => setSelectedBlockId(block.id)}
+          >
+            <CardContent className="space-y-3">
+              <div className="font-semibold text-lg">Блок #{block.id}</div>
+              <Textarea
+                placeholder="Сообщение"
+                value={block.message}
+                onChange={e => updateBlock(block.id, "message", e.target.value)}
+              />
+              {block.buttons.map((btn, i) => (
+                <Input
+                  key={i}
+                  placeholder={`Кнопка ${i + 1}`}
+                  value={btn}
+                  onChange={e => updateButton(block.id, i, e.target.value)}
+                />
+              ))}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    updateBlock(block.id, "buttons", [...block.buttons, ""])
+                  }
+                >
+                  ➕ Кнопка
+                </Button>
+
+                <select
+                  className="border rounded px-2 py-1"
+                  value={block.next || ""}
+                  onChange={e => setNextBlock(block.id, e.target.value)}
+                >
+                  <option value="">⏭ Следующий блок</option>
+                  {blocks.filter(b => b.id !== block.id).map(b => (
+                    <option key={b.id} value={b.id}>
+                      #{b.id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="pt-4">
+        <Button onClick={addBlock} className="gap-2">
+          <PlusCircle size={18} /> Новый блок
+        </Button>
+      </div>
+    </div>
+  );
+}
